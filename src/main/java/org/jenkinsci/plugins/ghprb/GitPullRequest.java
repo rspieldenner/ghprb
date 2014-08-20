@@ -11,9 +11,9 @@ import java.net.URL;
  *
  * @author Honza Brázdil <jbrazdil@redhat.com>
  */
-public interface GhprbPullRequest {
+public interface GitPullRequest {
 
-    public void init(Ghprb helper, GhprbRepository repo);
+    void init(Ghprb helper, GitRepository repo);
 
     /**
      * Checks this Pull Request representation against a GitHub version of the Pull Request, and triggers
@@ -21,30 +21,30 @@ public interface GhprbPullRequest {
      *
      * @param pr
      */
-    public void check(GHPullRequest pr);
+    void check(GHPullRequest pr);
 
-    public void check(GHIssueComment comment);
+    void check(GHIssueComment comment);
 
-    public boolean isWhiteListedTargetBranch();
+    boolean isWhiteListedTargetBranch();
 
-    public int getId();
+    int getId();
 
-    public String getHead();
+    String getHead();
 
-    public boolean isMergeable();
+    boolean isMergeable();
 
-    public String getTarget();
+    String getTarget();
 
-    public String getSource();
+    String getSource();
 
-    public String getAuthorEmail();
+    String getAuthorEmail();
 
-    public String getTitle();
+    String getTitle();
 
     /**
      * Returns the URL to the Github Pull Request.
      *
      * @return the Github Pull Request URL
      */
-    public URL getUrl();
+    URL getUrl();
 }

@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,25 +18,25 @@ import java.util.logging.Logger;
 /**
  * @author Honza Brázdil <jbrazdil@redhat.com>
  */
-public class GhprbRepository {
+public class GithubRepository implements GitRepository {
 
-    private static final Logger logger = Logger.getLogger(GhprbRepository.class.getName());
+    private static final Logger logger = Logger.getLogger(GithubRepository.class.getName());
     private static final EnumSet<GHEvent> HOOK_EVENTS = EnumSet.of(GHEvent.ISSUE_COMMENT, GHEvent.PULL_REQUEST);
 
     private final String reponame;
-    private final ConcurrentMap<Integer, GhprbPullRequest> pulls;
+    private final ConcurrentMap<Integer, GitPullRequest> pulls;
 
     private GHRepository ghRepository;
     private Ghprb helper;
 
-    public GhprbRepository(String user, String repository, Ghprb helper, ConcurrentMap<Integer, GhprbPullRequest> pulls) {
+    public GithubRepository(String user, String repository, Ghprb helper, ConcurrentMap<Integer, GitPullRequest> pulls) {
         this.reponame = user + "/" + repository;
         this.helper = helper;
         this.pulls = pulls;
     }
 
     public void init() {
-        for (GhprbPullRequest pull : pulls.values()) {
+        for (GitPullRequest pull : pulls.values()) {
             pull.init(helper, this);
         }
         // make the initial check call to populate our data structures
@@ -104,7 +103,7 @@ public class GhprbRepository {
 
     private void check(GHPullRequest pr) {
         final Integer id = pr.getNumber();
-        GhprbPullRequest pull;
+        GitPullRequest pull;
         if (pulls.containsKey(id)) {
             pull = pulls.get(id);
         } else {
@@ -201,13 +200,13 @@ public class GhprbRepository {
         return ghRepository.getPullRequest(id);
     }
 
-    void onIssueCommentHook(IssueComment issueComment) throws IOException {
+    public void onIssueCommentHook(IssueComment issueComment) throws IOException {
         int id = issueComment.getIssue().getNumber();
         logger.log(Level.FINER, "Comment on issue #{0} from {1}: {2}", new Object[]{id, issueComment.getComment().getUser(), issueComment.getComment().getBody()});
         if (!"created".equals(issueComment.getAction())) {
             return;
         }
-        GhprbPullRequest pull = pulls.get(id);
+        GitPullRequest pull = pulls.get(id);
         if (pull == null) {
             pull = new GithubPullRequest(ghRepository.getPullRequest(id), helper, this);
             pulls.put(id, pull);
@@ -216,16 +215,16 @@ public class GhprbRepository {
         GhprbTrigger.getDscp().save();
     }
 
-    void onPullRequestHook(PullRequest pr) {
+    public void onPullRequestHook(PullRequest pr) {
         if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
-            GhprbPullRequest pull = pulls.get(pr.getNumber());
+            GitPullRequest pull = pulls.get(pr.getNumber());
             if (pull == null) {
                 pulls.putIfAbsent(pr.getNumber(), new GithubPullRequest(pr.getPullRequest(), helper, this));
                 pull = pulls.get(pr.getNumber());
             }
             pull.check(pr.getPullRequest());
         } else if ("synchronize".equals(pr.getAction())) {
-            GhprbPullRequest pull = pulls.get(pr.getNumber());
+            GitPullRequest pull = pulls.get(pr.getNumber());
             if (pull == null) {
                 pulls.putIfAbsent(pr.getNumber(), new GithubPullRequest(pr.getPullRequest(), helper, this));
                 pull = pulls.get(pr.getNumber());

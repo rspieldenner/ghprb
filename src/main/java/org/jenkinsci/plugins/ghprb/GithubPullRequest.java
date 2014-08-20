@@ -19,9 +19,9 @@ import java.util.logging.Logger;
  *
  * @author Honza Brázdil <jbrazdil@redhat.com>
  */
-public class GithubPullRequest implements GhprbPullRequest {
+public class GithubPullRequest implements GitPullRequest {
 
-    private static final Logger logger = Logger.getLogger(GhprbPullRequest.class.getName());
+    private static final Logger logger = Logger.getLogger(GitPullRequest.class.getName());
 
     private final int id;
     private final GHUser author;
@@ -40,9 +40,9 @@ public class GithubPullRequest implements GhprbPullRequest {
     private boolean triggered = false;
 
     private transient Ghprb helper;
-    private transient GhprbRepository repo;
+    private transient GitRepository repo;
 
-    GithubPullRequest(GHPullRequest pr, Ghprb helper, GhprbRepository repo) {
+    GithubPullRequest(GHPullRequest pr, Ghprb helper, GitRepository repo) {
         id = pr.getNumber();
         updated = pr.getUpdatedAt();
         head = pr.getHead().getSha();
@@ -68,7 +68,7 @@ public class GithubPullRequest implements GhprbPullRequest {
         logger.log(Level.INFO, "Created Pull Request #{0} on {1} by {2} ({3}) updated at: {4} SHA: {5}", new Object[]{id, reponame, author.getLogin(), authorEmail, updated, head});
     }
 
-    public void init(Ghprb helper, GhprbRepository repo) {
+    public void init(Ghprb helper, GitRepository repo) {
         this.helper = helper;
         this.repo = repo;
         if (reponame == null) {

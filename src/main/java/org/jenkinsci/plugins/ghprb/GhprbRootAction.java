@@ -53,13 +53,13 @@ public class GhprbRootAction implements UnprotectedRootAction {
         try {
             if ("issue_comment".equals(event)) {
                 GHEventPayload.IssueComment issueComment = gh.get().parseEventPayload(new StringReader(payload), GHEventPayload.IssueComment.class);
-                for (GhprbRepository repo : getRepos(issueComment.getRepository())) {
+                for (GitRepository repo : getRepos(issueComment.getRepository())) {
                     logger.log(Level.INFO, "Checking issue comment '{0}' for repo {1}", new Object[] {issueComment.getComment(), repo.getName()});
                     repo.onIssueCommentHook(issueComment);
                 }
             } else if ("pull_request".equals(event)) {
                 GHEventPayload.PullRequest pr = gh.get().parseEventPayload(new StringReader(payload), GHEventPayload.PullRequest.class);
-                for (GhprbRepository repo : getRepos(pr.getPullRequest().getRepository())) {
+                for (GitRepository repo : getRepos(pr.getPullRequest().getRepository())) {
                     logger.log(Level.INFO, "Checking PR #{1} for {0}", new Object[] { repo.getName(), pr.getNumber()});
                     repo.onPullRequestHook(pr);
                 }
@@ -71,7 +71,7 @@ public class GhprbRootAction implements UnprotectedRootAction {
         }
     }
 
-    private Set<GhprbRepository> getRepos(GHRepository repo) throws IOException {
+    private Set<GitRepository> getRepos(GHRepository repo) throws IOException {
         try {
             return getRepos(repo.getOwner().getLogin() + "/" + repo.getName());
         } catch (Exception ex) {
@@ -91,8 +91,8 @@ public class GhprbRootAction implements UnprotectedRootAction {
         }
     }
 
-    private Set<GhprbRepository> getRepos(String repo) {
-        final Set<GhprbRepository> ret = new HashSet<GhprbRepository>();
+    private Set<GitRepository> getRepos(String repo) {
+        final Set<GitRepository> ret = new HashSet<GitRepository>();
 
         // We need this to get access to list of repositories
         Authentication old = SecurityContextHolder.getContext().getAuthentication();
@@ -104,7 +104,7 @@ public class GhprbRootAction implements UnprotectedRootAction {
                 if (trigger == null || trigger.getRepository() == null) {
                     continue;
                 }
-                GhprbRepository r = trigger.getRepository();
+                GitRepository r = trigger.getRepository();
                 if (repo.equals(r.getName())) {
                     ret.add(r);
                 }

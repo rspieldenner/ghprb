@@ -22,17 +22,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Unit test for {@link org.jenkinsci.plugins.ghprb.GhprbPullRequest}.
+ * Unit test for {@link GitPullRequest}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GhprbPullRequestTest {
+public class GithubPullRequestTest {
 
     @Mock
     private GHPullRequest pr;
     @Mock
     private Ghprb helper;
     @Mock
-    private GhprbRepository repo;
+    private GitRepository repo;
 
     @Test
     public void testConstructorWhenAuthorIsWhitelisted() throws IOException {
@@ -59,15 +59,15 @@ public class GhprbPullRequestTest {
         given(helper.isWhitelisted(ghUser)).willReturn(true);
 
         // WHEN
-        GhprbPullRequest ghprbPullRequest = new GithubPullRequest(pr, helper, repo);
+        GitPullRequest gitPullRequest = new GithubPullRequest(pr, helper, repo);
 
         // THEN
-        assertThat(ghprbPullRequest.getId()).isEqualTo(10);
-        assertThat(ghprbPullRequest.getAuthorEmail()).isEqualTo("email");
-        assertThat(ghprbPullRequest.getHead()).isEqualTo("some sha");
-        assertThat(ghprbPullRequest.getTitle()).isEqualTo("title");
-        assertThat(ghprbPullRequest.getTarget()).isEqualTo("some ref");
-        assertThat(ghprbPullRequest.isMergeable()).isFalse();
+        assertThat(gitPullRequest.getId()).isEqualTo(10);
+        assertThat(gitPullRequest.getAuthorEmail()).isEqualTo("email");
+        assertThat(gitPullRequest.getHead()).isEqualTo("some sha");
+        assertThat(gitPullRequest.getTitle()).isEqualTo("title");
+        assertThat(gitPullRequest.getTarget()).isEqualTo("some ref");
+        assertThat(gitPullRequest.isMergeable()).isFalse();
     }
 
     @Test
@@ -96,12 +96,12 @@ public class GhprbPullRequestTest {
         given(helper.isWhitelisted(ghUser)).willReturn(true);
 
 
-        GhprbPullRequest ghprbPullRequest = new GithubPullRequest(pr, helper, repo);
-        GhprbRepository ghprbRepository = mock(GhprbRepository.class);
+        GitPullRequest gitPullRequest = new GithubPullRequest(pr, helper, repo);
+        GitRepository ghprbRepository = mock(GithubRepository.class);
         given(ghprbRepository.getName()).willReturn("name");
 
         // WHEN
-        ghprbPullRequest.init(helper, ghprbRepository);
+        gitPullRequest.init(helper, ghprbRepository);
 
         // THEN
         verify(ghprbRepository, times(1)).getName();
@@ -134,12 +134,12 @@ public class GhprbPullRequestTest {
         given(helper.isWhitelisted(ghUser)).willReturn(true);
 
 
-        GhprbPullRequest ghprbPullRequest = new GithubPullRequest(pr, helper, repo);
-        GhprbRepository ghprbRepository = mock(GhprbRepository.class);
+        GitPullRequest gitPullRequest = new GithubPullRequest(pr, helper, repo);
+        GitRepository ghprbRepository = mock(GithubRepository.class);
         given(ghprbRepository.getName()).willReturn("name");
 
         // WHEN
-        ghprbPullRequest.init(helper, ghprbRepository);
+        gitPullRequest.init(helper, ghprbRepository);
 
         // THEN
         verify(ghprbRepository, never()).getName();

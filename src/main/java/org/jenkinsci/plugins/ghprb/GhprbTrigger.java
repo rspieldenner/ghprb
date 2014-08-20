@@ -128,7 +128,7 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         getDescriptor().save();
     }
 
-    public QueueTaskFuture<?> startJob(GhprbCause cause, GhprbRepository repo) {
+    public QueueTaskFuture<?> startJob(GhprbCause cause, GitRepository repo) {
         ArrayList<ParameterValue> values = getDefaultParameters();
         final String commitSha = cause.isMerged() ? "origin/pr/" + cause.getPullID() + "/merge" : cause.getCommit();
         values.add(new StringParameterValue("sha1", commitSha));
@@ -270,7 +270,7 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         return helper.getBuilds();
     }
 
-    public GhprbRepository getRepository() {
+    public GitRepository getRepository() {
         if(helper == null) {
             logger.log(Level.SEVERE, "The ghprb trigger for {0} wasn't properly started - helper is null", this.project);
             return null;
@@ -302,12 +302,12 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         private List<GhprbBranch> whiteListTargetBranches;
         private transient GhprbGitHub gh;
         // map of jobs (by their fullName) abd their map of pull requests
-        private Map<String, ConcurrentMap<Integer, GhprbPullRequest>> jobs;
+        private Map<String, ConcurrentMap<Integer, GitPullRequest>> jobs;
 
         public DescriptorImpl() {
             load();
             if (jobs == null) {
-                jobs = new HashMap<String, ConcurrentMap<Integer, GhprbPullRequest>>();
+                jobs = new HashMap<String, ConcurrentMap<Integer, GitPullRequest>>();
             }
         }
 
@@ -447,17 +447,17 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
             return gh;
         }
 
-        public ConcurrentMap<Integer, GhprbPullRequest> getPullRequests(String projectName) {
-            ConcurrentMap<Integer, GhprbPullRequest> ret;
+        public ConcurrentMap<Integer, GitPullRequest> getPullRequests(String projectName) {
+            ConcurrentMap<Integer, GitPullRequest> ret;
             if (jobs.containsKey(projectName)) {
-                Map<Integer, GhprbPullRequest> map = jobs.get(projectName);
+                Map<Integer, GitPullRequest> map = jobs.get(projectName);
                 if (!(map instanceof ConcurrentMap)) {
-                    map = new ConcurrentHashMap<Integer, GhprbPullRequest>(map);
+                    map = new ConcurrentHashMap<Integer, GitPullRequest>(map);
                 }
-                jobs.put(projectName, (ConcurrentMap<Integer, GhprbPullRequest>) map);
-                ret = (ConcurrentMap<Integer, GhprbPullRequest>) map;
+                jobs.put(projectName, (ConcurrentMap<Integer, GitPullRequest>) map);
+                ret = (ConcurrentMap<Integer, GitPullRequest>) map;
             } else {
-                ret = new ConcurrentHashMap<Integer, GhprbPullRequest>();
+                ret = new ConcurrentHashMap<Integer, GitPullRequest>();
                 jobs.put(projectName, ret);
             }
             return ret;

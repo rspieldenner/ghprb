@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.ghprb;
 
-import hudson.util.CopyOnWriteMap.Hash;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +22,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -43,10 +41,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
- * Unit tests for {@link GhprbRepository}.
+ * Unit tests for {@link GithubRepository}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GhprbRepositoryTest {
+public class GithubRepositoryTest {
 
     private static final String TEST_USER_NAME = "test-user";
     private static final String TEST_REPO_NAME = "test-repo";
@@ -71,9 +69,9 @@ public class GhprbRepositoryTest {
     @Mock
     private GHUser ghUser;
 
-    private GhprbRepository ghprbRepository;
-    private ConcurrentMap<Integer,GhprbPullRequest> pulls;
-    private GhprbPullRequest ghprbPullRequest;
+    private GitRepository ghprbRepository;
+    private ConcurrentMap<Integer,GitPullRequest> pulls;
+    private GitPullRequest gitPullRequest;
 
     @Before
     public void setUp() throws IOException {
@@ -100,7 +98,7 @@ public class GhprbRepositoryTest {
 
         given(helper.ifOnlyTriggerPhrase()).willReturn(true);
 
-        pulls.put(1, ghprbPullRequest);
+        pulls.put(1, gitPullRequest);
 
         given(ghPullRequest.getUpdatedAt()).willReturn(UPDATE_DATE);
         given(ghPullRequest.getNumber()).willReturn(1);
@@ -122,7 +120,7 @@ public class GhprbRepositoryTest {
 
         given(helper.ifOnlyTriggerPhrase()).willReturn(true);
 
-        pulls.put(1, ghprbPullRequest);
+        pulls.put(1, gitPullRequest);
 
         given(ghPullRequest.getUpdatedAt()).willReturn(UPDATE_DATE);
         given(ghPullRequest.getNumber()).willReturn(1);
@@ -185,7 +183,7 @@ public class GhprbRepositoryTest {
         verifyNoMoreInteractions(gt);
 
         /** GH PR verifications */
-        verify(builds, times(1)).build(any(GhprbPullRequest.class));
+        verify(builds, times(1)).build(any(GitPullRequest.class));
         verify(ghRepository, times(1)).getPullRequests(OPEN); // Call to Github API
         verify(ghRepository, times(1))
                 .createCommitStatus(eq("head sha"), eq(PENDING), isNull(String.class), eq("msg")); // Call to Github API
@@ -215,7 +213,7 @@ public class GhprbRepositoryTest {
     private GhprbBuilds mockBuilds() throws IOException {
         GhprbBuilds builds = mock(GhprbBuilds.class);
         given(helper.getBuilds()).willReturn(builds);
-        given(builds.build(any(GhprbPullRequest.class))).willReturn("msg");
+        given(builds.build(any(GitPullRequest.class))).willReturn("msg");
         given(ghRepository.createCommitStatus(anyString(), any(GHCommitState.class), anyString(), anyString())).willReturn(null);
         return builds;
     }
@@ -252,7 +250,7 @@ public class GhprbRepositoryTest {
         verifyNoMoreInteractions(gt);
 
         /** GH PR verifications */
-        verify(builds, times(1)).build(any(GhprbPullRequest.class));
+        verify(builds, times(1)).build(any(GitPullRequest.class));
         verify(ghRepository, times(2)).getPullRequests(eq(OPEN)); // Call to Github API
         verify(ghRepository, times(1))
                 .createCommitStatus(eq("head sha"), eq(PENDING), isNull(String.class), eq("msg")); // Call to Github API
@@ -325,7 +323,7 @@ public class GhprbRepositoryTest {
         verifyNoMoreInteractions(gt);
 
         /** GH PR verifications */
-        verify(builds, times(2)).build(any(GhprbPullRequest.class));
+        verify(builds, times(2)).build(any(GitPullRequest.class));
         verify(ghRepository, times(2)).getPullRequests(eq(OPEN)); // Call to Github API
         verify(ghRepository, times(2))
                 .createCommitStatus(eq("head sha"), eq(PENDING), isNull(String.class), eq("msg")); // Call to Github API
@@ -358,7 +356,7 @@ public class GhprbRepositoryTest {
         verify(ghUser, times(2)).getLogin();
         verifyNoMoreInteractions(ghUser);
 
-        verify(builds, times(2)).build(any(GhprbPullRequest.class));
+        verify(builds, times(2)).build(any(GitPullRequest.class));
         verifyNoMoreInteractions(builds);
     }
 
@@ -429,9 +427,9 @@ public class GhprbRepositoryTest {
         given(ghPullRequest.getHead()).willReturn(head);
         given(head.getSha()).willReturn("head sha");
 
-        pulls = new ConcurrentHashMap<Integer, GhprbPullRequest>();
-        ghprbRepository = new GhprbRepository(TEST_USER_NAME, TEST_REPO_NAME, helper, pulls);
-        ghprbPullRequest = new GithubPullRequest(ghPullRequest, helper, ghprbRepository);
+        pulls = new ConcurrentHashMap<Integer, GitPullRequest>();
+        ghprbRepository = new GithubRepository(TEST_USER_NAME, TEST_REPO_NAME, helper, pulls);
+        gitPullRequest = new GithubPullRequest(ghPullRequest, helper, ghprbRepository);
 
         // Reset mocks not to mix init data invocations with tests
         reset(ghPullRequest, ghUser, helper, head, base);

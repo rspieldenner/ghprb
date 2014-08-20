@@ -1,9 +1,7 @@
 package org.jenkinsci.plugins.ghprb;
 
 import com.coravy.hudson.plugins.github.GithubProjectProperty;
-import com.google.common.base.Preconditions;
 import hudson.model.AbstractProject;
-import jenkins.model.Jenkins;
 import org.kohsuke.github.GHUser;
 
 import java.util.*;
@@ -12,8 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.*;
 
 /**
  * @author janinko
@@ -31,10 +27,10 @@ public class Ghprb {
     private final Pattern retestPhrasePattern;
     private final Pattern whitelistPhrasePattern;
     private final Pattern oktotestPhrasePattern;
-    private GhprbRepository repository;
+    private GithubRepository repository;
     private GhprbBuilds builds;
 
-    public Ghprb(AbstractProject<?, ?> project, GhprbTrigger trigger, ConcurrentMap<Integer, GhprbPullRequest> pulls) {
+    public Ghprb(AbstractProject<?, ?> project, GhprbTrigger trigger, ConcurrentMap<Integer, GitPullRequest> pulls) {
         this.project = project;
 
         final GithubProjectProperty ghpp = project.getProperty(GithubProjectProperty.class);
@@ -62,7 +58,7 @@ public class Ghprb {
         whitelistPhrasePattern = Pattern.compile(trigger.getDescriptor().getWhitelistPhrase());
         oktotestPhrasePattern = Pattern.compile(trigger.getDescriptor().getOkToTestPhrase());
 
-        this.repository = new GhprbRepository(user, repo, this, pulls);
+        this.repository = new GithubRepository(user, repo, this, pulls);
         this.builds = new GhprbBuilds(trigger, repository);
     }
 
@@ -83,7 +79,7 @@ public class Ghprb {
         return builds;
     }
 
-    public GhprbRepository getRepository() {
+    public GithubRepository getRepository() {
         return repository;
     }
 

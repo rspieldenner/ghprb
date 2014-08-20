@@ -20,14 +20,14 @@ import java.util.logging.Logger;
 public class GhprbBuilds {
     private static final Logger logger = Logger.getLogger(GhprbBuilds.class.getName());
     private final GhprbTrigger trigger;
-    private final GhprbRepository repo;
+    private final GitRepository repo;
 
-    public GhprbBuilds(GhprbTrigger trigger, GhprbRepository repo) {
+    public GhprbBuilds(GhprbTrigger trigger, GitRepository repo) {
         this.trigger = trigger;
         this.repo = repo;
     }
 
-    public String build(GhprbPullRequest pr) {
+    public String build(GitPullRequest pr) {
         StringBuilder sb = new StringBuilder();
         if (cancelBuild(pr.getId())) {
             sb.append("Previous build stopped.");
