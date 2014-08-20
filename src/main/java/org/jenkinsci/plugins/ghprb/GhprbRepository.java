@@ -108,7 +108,7 @@ public class GhprbRepository {
         if (pulls.containsKey(id)) {
             pull = pulls.get(id);
         } else {
-            pulls.putIfAbsent(id, new GhprbPullRequest(pr, helper, this));
+            pulls.putIfAbsent(id, new GithubPullRequest(pr, helper, this));
             pull = pulls.get(id);
         }
         pull.check(pr);
@@ -209,7 +209,7 @@ public class GhprbRepository {
         }
         GhprbPullRequest pull = pulls.get(id);
         if (pull == null) {
-            pull = new GhprbPullRequest(ghRepository.getPullRequest(id), helper, this);
+            pull = new GithubPullRequest(ghRepository.getPullRequest(id), helper, this);
             pulls.put(id, pull);
         }
         pull.check(issueComment.getComment());
@@ -220,14 +220,14 @@ public class GhprbRepository {
         if ("opened".equals(pr.getAction()) || "reopened".equals(pr.getAction())) {
             GhprbPullRequest pull = pulls.get(pr.getNumber());
             if (pull == null) {
-                pulls.putIfAbsent(pr.getNumber(), new GhprbPullRequest(pr.getPullRequest(), helper, this));
+                pulls.putIfAbsent(pr.getNumber(), new GithubPullRequest(pr.getPullRequest(), helper, this));
                 pull = pulls.get(pr.getNumber());
             }
             pull.check(pr.getPullRequest());
         } else if ("synchronize".equals(pr.getAction())) {
             GhprbPullRequest pull = pulls.get(pr.getNumber());
             if (pull == null) {
-                pulls.putIfAbsent(pr.getNumber(), new GhprbPullRequest(pr.getPullRequest(), helper, this));
+                pulls.putIfAbsent(pr.getNumber(), new GithubPullRequest(pr.getPullRequest(), helper, this));
                 pull = pulls.get(pr.getNumber());
             }
             if (pull == null) {

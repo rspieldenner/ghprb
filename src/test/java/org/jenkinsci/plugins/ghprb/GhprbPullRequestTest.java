@@ -59,7 +59,7 @@ public class GhprbPullRequestTest {
         given(helper.isWhitelisted(ghUser)).willReturn(true);
 
         // WHEN
-        GhprbPullRequest ghprbPullRequest = new GhprbPullRequest(pr, helper, repo);
+        GhprbPullRequest ghprbPullRequest = new GithubPullRequest(pr, helper, repo);
 
         // THEN
         assertThat(ghprbPullRequest.getId()).isEqualTo(10);
@@ -96,7 +96,7 @@ public class GhprbPullRequestTest {
         given(helper.isWhitelisted(ghUser)).willReturn(true);
 
 
-        GhprbPullRequest ghprbPullRequest = new GhprbPullRequest(pr, helper, repo);
+        GhprbPullRequest ghprbPullRequest = new GithubPullRequest(pr, helper, repo);
         GhprbRepository ghprbRepository = mock(GhprbRepository.class);
         given(ghprbRepository.getName()).willReturn("name");
 
@@ -134,7 +134,7 @@ public class GhprbPullRequestTest {
         given(helper.isWhitelisted(ghUser)).willReturn(true);
 
 
-        GhprbPullRequest ghprbPullRequest = new GhprbPullRequest(pr, helper, repo);
+        GhprbPullRequest ghprbPullRequest = new GithubPullRequest(pr, helper, repo);
         GhprbRepository ghprbRepository = mock(GhprbRepository.class);
         given(ghprbRepository.getName()).willReturn("name");
 

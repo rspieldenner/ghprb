@@ -431,7 +431,7 @@ public class GhprbRepositoryTest {
 
         pulls = new ConcurrentHashMap<Integer, GhprbPullRequest>();
         ghprbRepository = new GhprbRepository(TEST_USER_NAME, TEST_REPO_NAME, helper, pulls);
-        ghprbPullRequest = new GhprbPullRequest(ghPullRequest, helper, ghprbRepository);
+        ghprbPullRequest = new GithubPullRequest(ghPullRequest, helper, ghprbRepository);
 
         // Reset mocks not to mix init data invocations with tests
         reset(ghPullRequest, ghUser, helper, head, base);
