@@ -2,7 +2,14 @@
   <f:entry title="${%Admin list}" field="adminlist">
     <f:textarea default="${descriptor.adminlist}"/>
   </f:entry>
-  <f:entry title="Use github hooks for build triggering" field="useGitHubHooks">
+  <f:entry title="Git Repository Manager" >
+    <f:radio name="repositoryManager" value="GitHub" checked="${instance.repositoryManager == 'Github'}" id="ghprb.repositorymanager.github"/>
+    <label class="attach-previous">GitHub</label>
+    <br/>
+    <f:radio name="repositoryManager" value="Stash" checked="${instance.repositoryManager == 'Stash'}" id="ghprb.repositorymanager.stash"/>
+    <label class="attach-previous">Stash</label>
+  </f:entry>
+  <f:entry title="Use repository hooks for build triggering" field="useRepositoryHooks">
     <f:checkbox />
   </f:entry>
   <f:advanced>

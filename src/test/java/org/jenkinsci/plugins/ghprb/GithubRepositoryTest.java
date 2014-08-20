@@ -156,7 +156,7 @@ public class GithubRepositoryTest {
         List<GHPullRequest> ghPullRequests = createListWithMockPR();
         ghPullRequests.add(ghPullRequest);
 
-        GhprbBuilds builds = mockBuilds();
+        GitBuilds builds = mockBuilds();
 
         mockHeadAndBase();
 
@@ -210,8 +210,8 @@ public class GithubRepositoryTest {
         verifyNoMoreInteractions(ghUser);
     }
 
-    private GhprbBuilds mockBuilds() throws IOException {
-        GhprbBuilds builds = mock(GhprbBuilds.class);
+    private GitBuilds mockBuilds() throws IOException {
+        GitBuilds builds = mock(GithubBuilds.class);
         given(helper.getBuilds()).willReturn(builds);
         given(builds.build(any(GitPullRequest.class))).willReturn("msg");
         given(ghRepository.createCommitStatus(anyString(), any(GHCommitState.class), anyString(), anyString())).willReturn(null);
@@ -225,7 +225,7 @@ public class GithubRepositoryTest {
 
         mockComments("comment body");
         mockHeadAndBase();
-        GhprbBuilds builds = mockBuilds();
+        GitBuilds builds = mockBuilds();
 
         given(ghRepository.getPullRequests(eq(GHIssueState.OPEN))).willReturn(ghPullRequests);
         given(ghPullRequest.getUpdatedAt()).willReturn(new Date()).willReturn(new DateTime().plusDays(1).toDate());
@@ -297,7 +297,7 @@ public class GithubRepositoryTest {
 
         mockComments("test this please");
         mockHeadAndBase();
-        GhprbBuilds builds = mockBuilds();
+        GitBuilds builds = mockBuilds();
 
         given(ghRepository.getPullRequests(eq(GHIssueState.OPEN))).willReturn(ghPullRequests);
         given(ghPullRequest.getUpdatedAt()).willReturn(new Date()).willReturn(new Date()).willReturn(new DateTime().plusDays(1).toDate());

@@ -28,7 +28,7 @@ public class Ghprb {
     private final Pattern whitelistPhrasePattern;
     private final Pattern oktotestPhrasePattern;
     private GithubRepository repository;
-    private GhprbBuilds builds;
+    private GitBuilds builds;
 
     public Ghprb(AbstractProject<?, ?> project, GhprbTrigger trigger, ConcurrentMap<Integer, GitPullRequest> pulls) {
         this.project = project;
@@ -59,12 +59,12 @@ public class Ghprb {
         oktotestPhrasePattern = Pattern.compile(trigger.getDescriptor().getOkToTestPhrase());
 
         this.repository = new GithubRepository(user, repo, this, pulls);
-        this.builds = new GhprbBuilds(trigger, repository);
+        this.builds = new GithubBuilds(trigger, repository);
     }
 
     public void init() {
         this.repository.init();
-        if (trigger.getUseGitHubHooks()) {
+        if (trigger.getUseRepositoryHooks()) {
             this.repository.createHook();
         }
     }
@@ -75,7 +75,7 @@ public class Ghprb {
         trigger.addWhitelist(author);
     }
 
-    public GhprbBuilds getBuilds() {
+    public GitBuilds getBuilds() {
         return builds;
     }
 

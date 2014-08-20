@@ -40,8 +40,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
     private final String orgslist;
     private final String cron;
     private final String triggerPhrase;
+    private final String repositoryManager;
     private final Boolean onlyTriggerPhrase;
-    private final Boolean useGitHubHooks;
+    private final Boolean useRepositoryHooks;
     private final Boolean permitAll;
     private String whitelist;
     private Boolean autoCloseFailedPullRequests;
@@ -55,8 +56,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
                         String orgslist,
                         String cron,
                         String triggerPhrase,
+                        String repositoryManager,
                         Boolean onlyTriggerPhrase,
-                        Boolean useGitHubHooks,
+                        Boolean useRepositoryHooks,
                         Boolean permitAll,
                         Boolean autoCloseFailedPullRequests,
                         List<GhprbBranch> whiteListTargetBranches) throws ANTLRException {
@@ -66,8 +68,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         this.orgslist = orgslist;
         this.cron = cron;
         this.triggerPhrase = triggerPhrase;
+        this.repositoryManager = repositoryManager;
         this.onlyTriggerPhrase = onlyTriggerPhrase;
-        this.useGitHubHooks = useGitHubHooks;
+        this.useRepositoryHooks = useRepositoryHooks;
         this.permitAll = permitAll;
         this.autoCloseFailedPullRequests = autoCloseFailedPullRequests;
         this.whiteListTargetBranches = whiteListTargetBranches;
@@ -121,7 +124,7 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
     @Override
     public void run() {
         // triggers are always triggered on the cron, but we just no-op if we are using GitHub hooks.
-        if (getUseGitHubHooks()) {
+        if (getUseRepositoryHooks()) {
             return;
         }
         helper.run();
@@ -227,8 +230,8 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         return onlyTriggerPhrase != null && onlyTriggerPhrase;
     }
 
-    public Boolean getUseGitHubHooks() {
-        return useGitHubHooks != null && useGitHubHooks;
+    public Boolean getUseRepositoryHooks() {
+        return useRepositoryHooks != null && useRepositoryHooks;
     }
 
     public Boolean getPermitAll() {
@@ -262,7 +265,7 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         this.helper = helper;
     }
 
-    public GhprbBuilds getBuilds() {
+    public GitBuilds getBuilds() {
         if(helper == null) {
             logger.log(Level.SEVERE, "The ghprb trigger for {0} wasn't properly started - helper is null", this.project);
             return null;
@@ -322,7 +325,7 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         }
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+        public boolean configure(StaplerRequest req, JSONObject formData) throws Descriptor.FormException {
             serverAPIUrl = formData.getString("serverAPIUrl");
             username = formData.getString("username");
             password = formData.getString("password");
@@ -447,6 +450,10 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
             return gh;
         }
 
+        public GhprbStash getStash() {
+            throw new UnsupportedOperationException();
+        }
+
         public ConcurrentMap<Integer, GitPullRequest> getPullRequests(String projectName) {
             ConcurrentMap<Integer, GitPullRequest> ret;
             if (jobs.containsKey(projectName)) {
@@ -463,13 +470,21 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
             return ret;
         }
 
-        public FormValidation doCreateApiToken(@QueryParameter("username") final String username, @QueryParameter("password") final String password) {
+        public FormValidation doCreateGitHubApiToken(@QueryParameter("username") final String username, @QueryParameter("password") final String password) {
             try {
                 GitHub gh = GitHub.connectToEnterprise(this.serverAPIUrl, username, password);
                 GHAuthorization token = gh.createToken(Arrays.asList(GHAuthorization.REPO_STATUS, GHAuthorization.REPO), "Jenkins GitHub Pull Request Builder", null);
                 return FormValidation.ok("Access token created: " + token.getToken());
             } catch (IOException ex) {
                 return FormValidation.error("GitHub API token couldn't be created: " + ex.getMessage());
+            }
+        }
+
+        public FormValidation doCreateStashApiToken(@QueryParameter("username") final String username, @QueryParameter("password") final String password) {
+            try {
+                throw new UnsupportedOperationException("not yet implemented");
+            } catch (UnsupportedOperationException ex) {
+                return FormValidation.error("Stash API token couldn't be created: " + ex.getMessage());
             }
         }
 
